@@ -1,0 +1,187 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Monetag Telegram App</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0a6cf2, #3be2c4);
+      color: white;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(8px);
+      border-radius: 15px;
+      padding: 20px;
+      max-width: 400px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: none;
+      font-size: 1rem;
+    }
+    button {
+      background: #005fff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.8);
+      padding: 12px 20px;
+      border-radius: 10px;
+      display: none;
+      color: white;
+      max-width: 90vw;
+      text-align: center;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="mainApp" style="display:none;">
+    <h2>Welcome, <span id="userName">User</span></h2>
+    <p>Points: <span id="pointsDisplay">0</span></p>
+
+    <button onclick="watchAd()">Watch Ad (Simulated)</button>
+    <hr />
+
+    <h3>Withdraw Points</h3>
+    <p>You must have at least 5000 points to withdraw.</p>
+    <input type="text" id="bkashInput" placeholder="Enter your bKash Number" />
+    <button onclick="withdraw()">Withdraw All Points</button>
+  </div>
+
+  <div id="toast"></div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    const backendBase = 'http://127.0.0.1:8000';
+    const user = tg.initDataUnsafe?.user || null;
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.style.display = 'block';
+      setTimeout(() => toast.style.display = 'none', 3000);
+    }
+
+    async function autoRegisterUser() {
+      if (!user) return;
+      const payload = {
+        user_id: user.id,
+        username: user.username || user.first_name || "unknown",
+        email_or_phone: `${user.id}@telegram`,
+        password: user.id.toString(),
+        confirm_password: user.id.toString()
+      };
+      try {
+        await fetch(`${backendBase}/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      } catch (err) {
+        console.log('Auto-register failed');
+      }
+    }
+
+    async function loadPoints() {
+      try {
+        const res = await fetch(`${backendBase}/points/${user.id}`);
+        const data = await res.json();
+        updatePoints(data.points || 0);
+      } catch {
+        updatePoints(0);
+      }
+    }
+
+    function updatePoints(val) {
+      document.getElementById('pointsDisplay').innerText = val;
+    }
+
+    async function watchAd() {
+      const options = [2, 3, 5, 7, 8, 10, 20];
+      const pts = options[Math.floor(Math.random() * options.length)];
+
+      try {
+        const res = await fetch(`${backendBase}/add_points`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: user.id, points: pts }),
+        });
+        const data = await res.json();
+        if (data.points !== undefined) {
+          updatePoints(data.points);
+          showToast(`You earned ${pts} points!`);
+        }
+      } catch {
+        showToast('Failed to add points.');
+      }
+    }
+
+    async function withdraw() {
+      const bkash = document.getElementById('bkashInput').value.trim();
+      if (!bkash) return showToast('Enter your bKash number.');
+
+      try {
+        const pointsRes = await fetch(`${backendBase}/points/${user.id}`);
+        const pointsData = await pointsRes.json();
+        const amount = pointsData.points || 0;
+
+        if (amount < 5000) return showToast('Need 5000 points to withdraw.');
+
+        const res = await fetch(`${backendBase}/withdraw`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: user.id,
+            username: user.username || user.first_name || "Unknown",
+            bkash_number: bkash,
+            amount: amount
+          }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          updatePoints(0);
+          showToast('Withdraw request sent!');
+        } else {
+          showToast('Withdraw failed.');
+        }
+      } catch {
+        showToast('Withdraw error.');
+      }
+    }
+
+    if (user) {
+      document.getElementById('userName').innerText = user.first_name || user.username || "User";
+      document.getElementById('mainApp').style.display = 'block';
+      autoRegisterUser();
+      loadPoints();
+    } else {
+      alert('Unable to load Telegram user info.');
+    }
+  </script>
+</body>
+</html>
