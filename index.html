@@ -159,9 +159,13 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
   <script>
-    const userId = 123456; // Replace with actual user ID dynamically
-    const username = "UserName"; // Replace with actual username dynamically
-    const backendBaseUrl = "https://your-backend-url"; // Replace with your backend API base URL
+    const userId = 123456; // TODO: dynamically get logged in user ID
+    const username = "UserName"; // TODO: dynamically get username
+    const backendBaseUrl = "https://your-backend-url"; // TODO: your backend URL here
+
+    // Keep track of how many ads watched from this IP during this session
+    let adsWatchedThisSession = 0;
+    const maxAdsPerIP = 3;
 
     function updatePointsDisplay(points) {
       document.getElementById("pointsDisplay").innerText = `Current Points: ${points}`;
@@ -207,7 +211,6 @@
         return;
       }
 
-      // Check current points before withdrawing
       let currentPoints = 0;
       try {
         const pointsRes = await fetch(`${backendBaseUrl}/points/${userId}`);
@@ -253,7 +256,32 @@
       }
     }
 
-    function showAd(buttonId) {
+    async function checkIpLimit() {
+      // Backend must implement /check_ip_limit?user_id=xxx
+      // Return JSON: { allowed: true/false, message: "" }
+      try {
+        const res = await fetch(`${backendBaseUrl}/check_ip_limit?user_id=${userId}`);
+        if (!res.ok) throw new Error("IP check failed");
+        const data = await res.json();
+        return data.allowed;
+      } catch (err) {
+        console.error("IP check error:", err);
+        // Fail open, allow clicks if error happens
+        return true;
+      }
+    }
+
+    async function showAd(buttonId) {
+      if (adsWatchedThisSession >= maxAdsPerIP) {
+        toastr.warning("You have reached the max ads per IP for this session. Please use another IP or VPN.");
+        return;
+      }
+      const ipAllowed = await checkIpLimit();
+      if (!ipAllowed) {
+        toastr.warning("Multiple ad clicks from your IP detected. Please use a different IP or VPN.");
+        return;
+      }
+
       show_9503680()
         .then(() => {
           // Reward user randomly after ad watched
@@ -261,6 +289,7 @@
           const earnedPoints =
             pointsOptions[Math.floor(Math.random() * pointsOptions.length)];
           addPoints(earnedPoints);
+          adsWatchedThisSession++;
         })
         .catch((err) => {
           toastr.error("Error displaying ad", "⚠️ Error");
