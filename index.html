@@ -12,9 +12,8 @@
   <script>
     const watchAdBtn = document.getElementById('watchAdBtn');
 
-    // Wait for Telegram WebApp to be ready before accessing data
+    // Function to get userId either from Telegram WebApp or URL param
     function getUserId() {
-      // If Telegram WebApp API exists and ready
       if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe) {
         const tgUser = Telegram.WebApp.initDataUnsafe.user;
         if (tgUser && tgUser.id) {
@@ -22,7 +21,6 @@
           return tgUser.id;
         }
       }
-      // Fallback to URL param
       const urlUserId = new URLSearchParams(window.location.search).get('id');
       if (urlUserId) {
         console.log("User ID from URL param:", urlUserId);
@@ -49,8 +47,15 @@
           });
         })
         .then(response => {
-          if (!response.ok) throw new Error('Server error');
-          alert("✅ Reward added!");
+          if (!response.ok) {
+            if(response.status === 400) {
+              alert("❌ You are not registered. Please use the bot to register first.");
+            } else {
+              throw new Error('Server error');
+            }
+          } else {
+            alert("✅ Reward added!");
+          }
         })
         .catch(error => {
           console.error("Error:", error);
