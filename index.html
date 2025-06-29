@@ -1,32 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Earn by Watching Ads</title>
   <script src="//libtl.com/sdk.js" data-zone="9503680" data-sdk="show_9503680"></script>
 </head>
 <body>
   <h2>🎁 Watch Ads & Earn!</h2>
-  <button onclick="watchAd()">▶️ Watch Ad</button>
+  <button id="watchAdBtn">▶️ Watch Ad</button>
 
   <script>
     const userId = new URLSearchParams(location.search).get('id');
+    const watchAdBtn = document.getElementById('watchAdBtn');
 
-    function watchAd() {
-      show_9503680().then(() => {
-        fetch("https://9869-103-138-145-240.ngrok-free.app/api/reward", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: userId })
-        }).then(() => {
-          alert("✅ Reward added!");
-        }).catch(() => {
-          alert("❌ Failed to contact server.");
-        });
-      }).catch(() => {
-        alert("❌ Ad failed or was skipped.");
-      });
+    if (!userId) {
+      alert("❌ Missing user ID in URL parameters.");
+      watchAdBtn.disabled = true;
     }
+
+    watchAdBtn.onclick = function() {
+      watchAdBtn.disabled = true;
+      show_9503680()
+        .then(() => {
+          return fetch("https://9869-103-138-145-240.ngrok-free.app/api/reward", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: userId })
+          });
+        })
+        .then(response => {
+          if (!response.ok) throw new Error('Server error');
+          alert("✅ Reward added!");
+        })
+        .catch(error => {
+          console.error("Error:", error);
+          alert("❌ Failed to contact server or ad was skipped.");
+        })
+        .finally(() => {
+          watchAdBtn.disabled = false;
+        });
+    };
   </script>
 </body>
 </html>
