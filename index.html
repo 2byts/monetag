@@ -1,187 +1,305 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Monetag Telegram App</title>
+  <title>MONETAG SELF CLICK BY BX..</title>
+
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
+  <!-- Toastr for notifications -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"
+  />
+
+  <!-- Animate.css -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+  />
+
+  <!-- Monetag SDK -->
+  <script src="//libtl.com/sdk.js" data-zone="9503680" data-sdk="show_9503680"></script>
+
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #0a6cf2, #3be2c4);
-      color: white;
-      margin: 0;
-      padding: 20px;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
       min-height: 100vh;
+      background-color: #f5f5f5;
+      font-family: "Arial", sans-serif;
+      margin: 0;
+      padding: 20px;
     }
     .container {
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(8px);
+      text-align: center;
+      background-color: #fff;
+      padding: 40px 30px;
       border-radius: 15px;
-      padding: 20px;
-      max-width: 400px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
       width: 100%;
+      max-width: 480px;
       box-sizing: border-box;
     }
-    input, button {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 30px;
+      font-weight: 700;
+    }
+    .btn {
+      font-size: 1.15rem;
+      padding: 12px 30px;
+      margin: 10px 5px;
       border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      min-width: 120px;
+    }
+    .btn-primary {
+      background-color: #007bff;
       border: none;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background-color: #0056b3;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    .btn-success {
+      background-color: #28a745;
+      border: none;
+      color: #fff;
+    }
+    .btn-success:hover {
+      background-color: #218838;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    .btn-warning {
+      background-color: #ffc107;
+      border: none;
+      color: #212529;
+    }
+    .btn-warning:hover {
+      background-color: #e0a800;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    .btn-red {
+      background-color: #f44336;
+      border: none;
+      color: #fff;
+    }
+    .btn-red:hover {
+      background-color: #c62828;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    #pointsDisplay {
+      font-weight: 700;
+      font-size: 1.3rem;
+      margin: 15px 0 30px;
+      color: #333;
+    }
+    #withdrawSection {
+      margin-top: 40px;
+      text-align: left;
+    }
+    #withdrawSection h3 {
+      margin-bottom: 20px;
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+    #withdrawSection input {
+      width: 100%;
+      padding: 10px 15px;
       font-size: 1rem;
-    }
-    button {
-      background: #005fff;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    #toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.8);
-      padding: 12px 20px;
-      border-radius: 10px;
-      display: none;
-      color: white;
-      max-width: 90vw;
-      text-align: center;
-      z-index: 9999;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+      box-sizing: border-box;
     }
   </style>
 </head>
 <body>
-  <div class="container" id="mainApp" style="display:none;">
-    <h2>Welcome, <span id="userName">User</span></h2>
-    <p>Points: <span id="pointsDisplay">0</span></p>
+  <div class="container animate__animated animate__fadeIn">
+    <h2>Watch Ads and Earn Rewards!</h2>
 
-    <button onclick="watchAd()">Watch Ad (Simulated)</button>
-    <hr />
+    <div>
+      <button id="showAdButton1" class="btn btn-primary">Show Ad 1</button>
+      <button id="showAdButton2" class="btn btn-success">Show Ad 2</button>
+      <button id="showAdButton3" class="btn btn-warning">Show Ad 3</button>
+      <button id="showAdButton4" class="btn btn-red">Show Ad 4</button>
+    </div>
 
-    <h3>Withdraw Points</h3>
-    <p>You must have at least 5000 points to withdraw.</p>
-    <input type="text" id="bkashInput" placeholder="Enter your bKash Number" />
-    <button onclick="withdraw()">Withdraw All Points</button>
+    <div id="pointsDisplay">Current Points: 0</div>
+
+    <div id="withdrawSection">
+      <h3>Withdraw Points</h3>
+      <p>You need at least 5000 points to withdraw.</p>
+      <input
+        type="text"
+        id="bkashNumber"
+        placeholder="Enter your bKash Number"
+        maxlength="15"
+      />
+      <button id="withdrawBtn" class="btn btn-primary w-100">Withdraw All Points</button>
+    </div>
   </div>
 
-  <div id="toast"></div>
+  <!-- Bootstrap Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Toastr JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+    const userId = 123456; // Replace with actual user ID dynamically
+    const username = "UserName"; // Replace with actual username dynamically
+    const backendBaseUrl = "https://your-backend-url"; // Replace with your backend API base URL
 
-    const backendBase = 'http://127.0.0.1:8000';
-    const user = tg.initDataUnsafe?.user || null;
-
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.innerText = msg;
-      toast.style.display = 'block';
-      setTimeout(() => toast.style.display = 'none', 3000);
+    function updatePointsDisplay(points) {
+      document.getElementById("pointsDisplay").innerText = `Current Points: ${points}`;
     }
 
-    async function autoRegisterUser() {
-      if (!user) return;
-      const payload = {
-        user_id: user.id,
-        username: user.username || user.first_name || "unknown",
-        email_or_phone: `${user.id}@telegram`,
-        password: user.id.toString(),
-        confirm_password: user.id.toString()
-      };
+    async function fetchPoints() {
       try {
-        await fetch(`${backendBase}/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
+        const response = await fetch(`${backendBaseUrl}/points/${userId}`);
+        if (!response.ok) throw new Error("Failed to fetch points");
+        const data = await response.json();
+        updatePointsDisplay(data.points || 0);
       } catch (err) {
-        console.log('Auto-register failed');
+        console.error(err);
+        updatePointsDisplay(0);
       }
     }
 
-    async function loadPoints() {
+    async function addPoints(pointsToAdd) {
       try {
-        const res = await fetch(`${backendBase}/points/${user.id}`);
-        const data = await res.json();
-        updatePoints(data.points || 0);
-      } catch {
-        updatePoints(0);
-      }
-    }
-
-    function updatePoints(val) {
-      document.getElementById('pointsDisplay').innerText = val;
-    }
-
-    async function watchAd() {
-      const options = [2, 3, 5, 7, 8, 10, 20];
-      const pts = options[Math.floor(Math.random() * options.length)];
-
-      try {
-        const res = await fetch(`${backendBase}/add_points`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user_id: user.id, points: pts }),
+        const response = await fetch(`${backendBaseUrl}/add_points`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: userId, points: pointsToAdd }),
         });
-        const data = await res.json();
+        if (!response.ok) throw new Error("Failed to add points");
+        const data = await response.json();
         if (data.points !== undefined) {
-          updatePoints(data.points);
-          showToast(`You earned ${pts} points!`);
+          updatePointsDisplay(data.points);
+          toastr.success(`You earned ${pointsToAdd} points!`, "🎉 Congrats!");
+        } else {
+          toastr.error("Error updating points");
         }
-      } catch {
-        showToast('Failed to add points.');
+      } catch (error) {
+        console.error(error);
+        toastr.error("Network error");
       }
     }
 
-    async function withdraw() {
-      const bkash = document.getElementById('bkashInput').value.trim();
-      if (!bkash) return showToast('Enter your bKash number.');
+    async function withdrawPoints() {
+      const bkashNumber = document.getElementById("bkashNumber").value.trim();
+      if (!bkashNumber) {
+        toastr.warning("Please enter your bKash number");
+        return;
+      }
+
+      // Check current points before withdrawing
+      let currentPoints = 0;
+      try {
+        const pointsRes = await fetch(`${backendBaseUrl}/points/${userId}`);
+        if (!pointsRes.ok) throw new Error("Failed to fetch points");
+        const pointsData = await pointsRes.json();
+        currentPoints = pointsData.points || 0;
+      } catch (err) {
+        toastr.error("Could not get current points");
+        return;
+      }
+
+      if (currentPoints < 5000) {
+        toastr.warning("You need at least 5000 points to withdraw");
+        return;
+      }
 
       try {
-        const pointsRes = await fetch(`${backendBase}/points/${user.id}`);
-        const pointsData = await pointsRes.json();
-        const amount = pointsData.points || 0;
-
-        if (amount < 5000) return showToast('Need 5000 points to withdraw.');
-
-        const res = await fetch(`${backendBase}/withdraw`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const res = await fetch(`${backendBaseUrl}/withdraw`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            user_id: user.id,
-            username: user.username || user.first_name || "Unknown",
-            bkash_number: bkash,
-            amount: amount
+            user_id: userId,
+            username: username,
+            bkash_number: bkashNumber,
+            amount: currentPoints,
           }),
         });
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.detail || "Withdrawal failed");
+        }
         const data = await res.json();
         if (data.success) {
-          updatePoints(0);
-          showToast('Withdraw request sent!');
+          updatePointsDisplay(0);
+          document.getElementById("bkashNumber").value = "";
+          toastr.success("Withdraw request sent! Admin will contact you.");
         } else {
-          showToast('Withdraw failed.');
+          toastr.error(data.detail || "Withdraw failed");
         }
-      } catch {
-        showToast('Withdraw error.');
+      } catch (error) {
+        console.error(error);
+        toastr.error(error.message || "Withdraw request failed");
       }
     }
 
-    if (user) {
-      document.getElementById('userName').innerText = user.first_name || user.username || "User";
-      document.getElementById('mainApp').style.display = 'block';
-      autoRegisterUser();
-      loadPoints();
-    } else {
-      alert('Unable to load Telegram user info.');
+    function showAd(buttonId) {
+      show_9503680()
+        .then(() => {
+          // Reward user randomly after ad watched
+          const pointsOptions = [2, 3, 5, 7, 8, 10, 20];
+          const earnedPoints =
+            pointsOptions[Math.floor(Math.random() * pointsOptions.length)];
+          addPoints(earnedPoints);
+        })
+        .catch((err) => {
+          toastr.error("Error displaying ad", "⚠️ Error");
+          console.error(err);
+        });
     }
+
+    // Auto In-App Ads config
+    show_9503680({
+      type: "inApp",
+      inAppSettings: {
+        frequency: 2,
+        capping: 0.1,
+        interval: 30,
+        timeout: 5,
+        everyPage: false,
+      },
+    });
+
+    // Event listeners
+    document
+      .getElementById("showAdButton1")
+      .addEventListener("click", () => showAd("Show Ad 1"));
+    document
+      .getElementById("showAdButton2")
+      .addEventListener("click", () => showAd("Show Ad 2"));
+    document
+      .getElementById("showAdButton3")
+      .addEventListener("click", () => showAd("Show Ad 3"));
+    document
+      .getElementById("showAdButton4")
+      .addEventListener("click", () => showAd("Show Ad 4"));
+
+    document
+      .getElementById("withdrawBtn")
+      .addEventListener("click", withdrawPoints);
+
+    // On page load, fetch and show user points
+    fetchPoints();
   </script>
 </body>
 </html>
