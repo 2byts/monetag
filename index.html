@@ -12,26 +12,33 @@
   <script>
     const watchAdBtn = document.getElementById('watchAdBtn');
 
-    // Try to get Telegram user ID from Telegram WebApp API if available
-    let userId = null;
-    if (window.Telegram?.WebApp) {
-      const tgUser = Telegram.WebApp.initDataUnsafe?.user;
-      userId = tgUser?.id;
-      console.log("User ID from Telegram WebApp:", userId);
+    // Wait for Telegram WebApp to be ready before accessing data
+    function getUserId() {
+      // If Telegram WebApp API exists and ready
+      if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe) {
+        const tgUser = Telegram.WebApp.initDataUnsafe.user;
+        if (tgUser && tgUser.id) {
+          console.log("User ID from Telegram WebApp:", tgUser.id);
+          return tgUser.id;
+        }
+      }
+      // Fallback to URL param
+      const urlUserId = new URLSearchParams(window.location.search).get('id');
+      if (urlUserId) {
+        console.log("User ID from URL param:", urlUserId);
+        return urlUserId;
+      }
+      return null;
     }
 
-    // Fallback: get user ID from URL parameter
-    if (!userId) {
-      userId = new URLSearchParams(location.search).get('id');
-      console.log("User ID from URL param:", userId);
-    }
+    const userId = getUserId();
 
     if (!userId) {
       alert("❌ Missing user ID in URL parameters or Telegram WebApp.");
       watchAdBtn.disabled = true;
     }
 
-    watchAdBtn.onclick = function() {
+    watchAdBtn.addEventListener('click', () => {
       watchAdBtn.disabled = true;
       show_9503680()
         .then(() => {
@@ -52,7 +59,7 @@
         .finally(() => {
           watchAdBtn.disabled = false;
         });
-    };
+    });
   </script>
 </body>
 </html>
