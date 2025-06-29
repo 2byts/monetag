@@ -10,11 +10,24 @@
   <button id="watchAdBtn">▶️ Watch Ad</button>
 
   <script>
-    const userId = new URLSearchParams(location.search).get('id');
     const watchAdBtn = document.getElementById('watchAdBtn');
 
+    // Try to get Telegram user ID from Telegram WebApp API if available
+    let userId = null;
+    if (window.Telegram?.WebApp) {
+      const tgUser = Telegram.WebApp.initDataUnsafe?.user;
+      userId = tgUser?.id;
+      console.log("User ID from Telegram WebApp:", userId);
+    }
+
+    // Fallback: get user ID from URL parameter
     if (!userId) {
-      alert("❌ Missing user ID in URL parameters.");
+      userId = new URLSearchParams(location.search).get('id');
+      console.log("User ID from URL param:", userId);
+    }
+
+    if (!userId) {
+      alert("❌ Missing user ID in URL parameters or Telegram WebApp.");
       watchAdBtn.disabled = true;
     }
 
